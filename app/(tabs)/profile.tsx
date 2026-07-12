@@ -9,6 +9,8 @@ import {
   Modal,
   ActivityIndicator,
   Switch,
+  Share,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,6 +51,15 @@ export default function ProfileScreen() {
     }
   };
 
+  const onShareInvite = async () => {
+    if (!user?.invite_code) return;
+    try {
+      await Share.share({
+        message: `Vem para o Love Alarm! Usa o meu código de convite ${user.invite_code} quando criares a tua conta.`,
+      });
+    } catch {}
+  };
+
   const onLogout = () => {
     Alert.alert('Sair', 'Tens a certeza que queres sair?', [
       { text: 'Cancelar', style: 'cancel' },
@@ -78,6 +89,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Perfil</Text>
 
       <View style={styles.card}>
@@ -129,7 +141,18 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      <View style={styles.spacer} />
+      <View style={styles.inviteCard}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.sectionLabel}>Convida amigos</Text>
+          <Text style={styles.sectionHint}>
+            O alarme só tem piada com gente por perto a usá-lo. Partilha o teu código.
+          </Text>
+          <Text style={styles.inviteCode}>{user?.invite_code}</Text>
+        </View>
+        <TouchableOpacity style={styles.shareButton} onPress={onShareInvite} activeOpacity={0.85}>
+          <Ionicons name="share-social-outline" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={onLogout} activeOpacity={0.85}>
         <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
@@ -143,6 +166,7 @@ export default function ProfileScreen() {
       >
         <Text style={styles.deleteAccountText}>Apagar conta</Text>
       </TouchableOpacity>
+      </ScrollView>
 
       <Modal visible={deleteModalOpen} transparent animationType="fade" onRequestClose={closeDeleteModal}>
         <View style={styles.modalOverlay}>
@@ -187,7 +211,8 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg, paddingHorizontal: 20 },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
   title: { color: Colors.text, fontSize: 26, fontWeight: '800', marginTop: 8, marginBottom: 20 },
   card: {
     alignItems: 'center',
@@ -237,8 +262,28 @@ const styles = StyleSheet.create({
     borderColor: Colors.cardBorder,
     padding: 16,
   },
-  spacer: { flex: 1 },
+  inviteCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginTop: 14,
+    backgroundColor: Colors.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+    padding: 16,
+  },
+  inviteCode: { color: Colors.heart, fontSize: 20, fontWeight: '800', letterSpacing: 2, marginTop: 8 },
+  shareButton: {
+    backgroundColor: Colors.heart,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   logoutButton: {
+    marginTop: 28,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

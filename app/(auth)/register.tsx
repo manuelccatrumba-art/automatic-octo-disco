@@ -14,13 +14,15 @@ import { Link } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Colors } from '../../constants/Colors';
 import { HeartAlarm } from '../../components/HeartAlarm';
-import { ApiError } from '../../services/api';
+import { ApiError, REGIONS } from '../../services/api';
 
 export default function RegisterScreen() {
   const { register } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [region, setRegion] = useState(REGIONS[0].value);
+  const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +34,7 @@ export default function RegisterScreen() {
     setError(null);
     setLoading(true);
     try {
-      await register(username.trim().toLowerCase(), password, displayName.trim());
+      await register(username.trim().toLowerCase(), password, displayName.trim(), region, inviteCode.trim() || undefined);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Não foi possível criar a conta');
     } finally {
@@ -73,6 +75,34 @@ export default function RegisterScreen() {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
+          />
+
+          <Text style={styles.fieldLabel}>A tua zona</Text>
+          <Text style={styles.fieldHint}>
+            O alarme só funciona entre pessoas na mesma zona — lançamos por etapas.
+          </Text>
+          <View style={styles.regionRow}>
+            {REGIONS.map((r) => (
+              <TouchableOpacity
+                key={r.value}
+                style={[styles.regionChip, region === r.value && styles.regionChipSelected]}
+                onPress={() => setRegion(r.value)}
+              >
+                <Text style={[styles.regionChipText, region === r.value && styles.regionChipTextSelected]}>
+                  {r.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="código de convite (opcional)"
+            placeholderTextColor={Colors.textFaint}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            value={inviteCode}
+            onChangeText={setInviteCode}
           />
           {error && <Text style={styles.error}>{error}</Text>}
 
@@ -124,6 +154,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   error: { color: Colors.danger, fontSize: 14, textAlign: 'center' },
+  fieldLabel: { color: Colors.text, fontSize: 14, fontWeight: '700', marginTop: 4 },
+  fieldHint: { color: Colors.textMuted, fontSize: 12, lineHeight: 17, marginTop: -6 },
+  regionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  regionChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 18,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+  },
+  regionChipSelected: { backgroundColor: Colors.heart, borderColor: Colors.heart },
+  regionChipText: { color: Colors.textMuted, fontSize: 13, fontWeight: '600' },
+  regionChipTextSelected: { color: '#fff' },
   button: {
     backgroundColor: Colors.heart,
     borderRadius: 16,

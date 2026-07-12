@@ -40,7 +40,13 @@ export type User = {
   alarm_radius_m: number;
   alarm_active?: boolean;
   paused?: boolean;
+  region?: string;
+  invite_code?: string;
 };
+
+export type Region = { value: string; label: string };
+
+export const REGIONS: Region[] = [{ value: 'luanda', label: 'Luanda' }];
 
 export type ReportReason = 'assedio' | 'perfil_falso' | 'conteudo_inadequado' | 'comportamento_suspeito' | 'outro';
 
@@ -65,10 +71,10 @@ export type LocationUpdateResult = {
 };
 
 export const api = {
-  register: (username: string, password: string, display_name: string) =>
+  register: (username: string, password: string, display_name: string, region: string, invite_code?: string) =>
     request<{ token: string; user: User }>('/auth/register', {
       method: 'POST',
-      body: { username, password, display_name },
+      body: { username, password, display_name, region, invite_code: invite_code || undefined },
     }),
 
   login: (username: string, password: string) =>

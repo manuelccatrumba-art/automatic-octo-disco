@@ -4,7 +4,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { Colors } from '../constants/Colors';
-import { hasRespondedToBackgroundDisclosure } from '../services/onboarding';
+import { hasRespondedToBackgroundDisclosure, hasSeenIntro } from '../services/onboarding';
 import '../services/backgroundLocation';
 
 function RootNavigation() {
@@ -15,13 +15,17 @@ function RootNavigation() {
   useEffect(() => {
     if (loading) return;
     const inAuthGroup = segments[0] === '(auth)';
+    const inIntro = segments[0] === 'onboarding' && (segments as string[])[1] === 'intro';
     const inOnboarding = segments[0] === 'onboarding';
 
-    if (!token && !inAuthGroup) {
-      router.replace('/(auth)/login');
+    if (!token) {
+      if (inAuthGroup || inIntro) return;
+      hasSeenIntro().then((seen) => {
+        router.replace(seen ? '/(auth)/login' : '/onboarding/intro');
+      });
       return;
     }
-    if (token && inAuthGroup) {
+    if (token && (inAuthGroup || inIntro)) {
       router.replace('/(tabs)');
       return;
     }

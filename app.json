@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "Love Alarm",
+    "slug": "love-alarm",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "lovealarm",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0A0510"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lovealarm.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "O Love Alarm precisa da tua localização para saber quando alguém que gosta de ti está perto.",
+        "UIBackgroundModes": [
+          "location"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.lovealarm.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0510",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "O Love Alarm precisa da tua localização para saber quando alguém que gosta de ti está perto.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#FF3B6F"
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d0694f18-2ea3-41e5-8cfe-74ac91579c1b"
+      }
+    },
+    "owner": "noamecc"
+  }
+}

@@ -30,11 +30,11 @@ jobs:
       - name: Expo prebuild (Android)
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build debug APK
+      - name: Build release APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
-          name: love-alarm-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: love-alarm-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk

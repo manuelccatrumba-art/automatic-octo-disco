@@ -42,6 +42,9 @@ export type User = {
   paused?: boolean;
   region?: string;
   invite_code?: string;
+  avatar_base64?: string | null;
+  bio?: string | null;
+  pronouns?: string | null;
 };
 
 export type Region = { value: string; label: string };
@@ -61,6 +64,9 @@ export type MatchEntry = {
   id: number;
   username: string;
   display_name: string;
+  avatar_base64?: string | null;
+  bio?: string | null;
+  pronouns?: string | null;
   revealed_at: string;
 };
 
@@ -90,6 +96,9 @@ export const api = {
 
   updatePaused: (token: string, paused: boolean) =>
     request<{ ok: true }>('/me', { method: 'PATCH', token, body: { paused } }),
+
+  updateProfile: (token: string, fields: { avatar_base64?: string | null; bio?: string | null; pronouns?: string | null }) =>
+    request<{ ok: true }>('/me', { method: 'PATCH', token, body: fields }),
 
   searchUsers: (token: string, q: string) =>
     request<{ users: CrushCandidate[] }>(`/users/search?q=${encodeURIComponent(q)}`, { token }),

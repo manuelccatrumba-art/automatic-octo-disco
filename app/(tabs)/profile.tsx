@@ -12,9 +12,12 @@ import {
   Share,
   ScrollView,
   Linking,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Colors } from '../../constants/Colors';
 import { useAuth } from '../../contexts/AuthContext';
 import { api, ApiError } from '../../services/api';
@@ -30,6 +33,11 @@ export default function ProfileScreen() {
   const [deleting, setDeleting] = useState(false);
   const [togglingPause, setTogglingPause] = useState(false);
   const [loggingOutAll, setLoggingOutAll] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [bio, setBio] = useState(user?.bio ?? '');
+  const [pronouns, setPronouns] = useState(user?.pronouns ?? '');
+  const [savingBio, setSavingBio] = useState(false);
+  const [savingPronouns, setSavingPronouns] = useState(false);
 
   const onTogglePause = async (value: boolean) => {
     if (!token) return;
@@ -50,6 +58,61 @@ export default function ProfileScreen() {
       await refreshUser();
     } finally {
       setSavingRadius(null);
+    }
+  };
+
+  const onPickAvatar = async () => {
+    if (!token) return;
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (perm.status !== 'granted') {
+      Alert.alert('Sem permissão', 'Precisamos de acesso às tuas fotos para mudar a foto de perfil.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets?.[0]) return;
+
+    setUploadingAvatar(true);
+    try {
+      const rendered = await ImageManipulator.manipulate(result.assets[0].uri).resize({ width: 480 }).renderAsync();
+      const saved = await rendered.saveAsync({ base64: true, compress: 0.6, format: SaveFormat.JPEG });
+      if (!saved.base64) throw new Error('não foi possível processar a imagem');
+      await api.updateProfile(token, { avatar_base64: `data:image/jpeg;base64,${saved.base64}` });
+      await refreshUser();
+    } catch (e) {
+      Alert.alert('Não foi possível mudar a foto', e instanceof ApiError ? e.message : 'Tenta novamente.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const onSaveBio = async () => {
+    if (!token) return;
+    setSavingBio(true);
+    try {
+      await api.updateProfile(token, { bio: bio.trim() || null });
+      await refreshUser();
+    } catch (e) {
+      Alert.alert('Não foi possível guardar a bio', e instanceof ApiError ? e.message : 'Tenta novamente.');
+    } finally {
+      setSavingBio(false);
+    }
+  };
+
+  const onSavePronouns = async () => {
+    if (!token) return;
+    setSavingPronouns(true);
+    try {
+      await api.updateProfile(token, { pronouns: pronouns.trim() || null });
+      await refreshUser();
+    } catch (e) {
+      Alert.alert('Não foi possível guardar', e instanceof ApiError ? e.message : 'Tenta novamente.');
+    } finally {
+      setSavingPronouns(false);
     }
   };
 
@@ -119,11 +182,55 @@ export default function ProfileScreen() {
       <Text style={styles.title}>Perfil</Text>
 
       <View style={styles.card}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{user?.display_name.charAt(0).toUpperCase()}</Text>
-        </View>
+        <TouchableOpacity onPress={onPickAvatar} disabled={uploadingAvatar} activeOpacity={0.8}>
+          <View style={styles.avatar}>
+            {user?.avatar_base64 ? (
+              <Image source={{ uri: user.avatar_base64 }} style={styles.avatarImage} />
+            ) : (
+              <Text style={styles.avatarText}>{user?.display_name.charAt(0).toUpperCase()}</Text>
+            )}
+            <View style={styles.avatarEditBadge}>
+              {uploadingAvatar ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Ionicons name="camera" size={14} color="#fff" />
+              )}
+            </View>
+          </View>
+        </TouchableOpacity>
         <Text style={styles.name}>{user?.display_name}</Text>
-        <Text style={styles.username}>@{user?.username}</Text>
+        <Text style={styles.username}>
+          @{user?.username}
+          {user?.pronouns ? `  ·  ${user.pronouns}` : ''}
+        </Text>
+      </View>
+
+      <Text style={styles.sectionLabel}>Sobre ti</Text>
+      <Text style={styles.sectionHint}>Uma frase curta e os pronomes que usas — só quem tiver match contigo vê.</Text>
+      <View style={styles.aboutRow}>
+        <TextInput
+          style={styles.aboutInput}
+          placeholder="uma frase sobre ti (opcional)"
+          placeholderTextColor={Colors.textFaint}
+          value={bio}
+          onChangeText={setBio}
+          maxLength={160}
+          onEndEditing={onSaveBio}
+          multiline
+        />
+        {savingBio && <ActivityIndicator size="small" color={Colors.textFaint} />}
+      </View>
+      <View style={styles.aboutRow}>
+        <TextInput
+          style={styles.aboutInputShort}
+          placeholder="pronomes (opcional)"
+          placeholderTextColor={Colors.textFaint}
+          value={pronouns}
+          onChangeText={setPronouns}
+          maxLength={30}
+          onEndEditing={onSavePronouns}
+        />
+        {savingPronouns && <ActivityIndicator size="small" color={Colors.textFaint} />}
       </View>
 
       <Text style={styles.sectionLabel}>Alcance do alarme</Text>
@@ -285,10 +392,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    overflow: 'visible',
   },
+  avatarImage: { width: '100%', height: '100%', borderRadius: 34 },
   avatarText: { color: Colors.heart, fontSize: 28, fontWeight: '800' },
+  avatarEditBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.heart,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.card,
+  },
   name: { color: Colors.text, fontSize: 19, fontWeight: '700' },
   username: { color: Colors.textFaint, fontSize: 14, marginTop: 2 },
+  aboutRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  aboutInput: {
+    flex: 1,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: Colors.text,
+    fontSize: 14,
+    minHeight: 48,
+  },
+  aboutInputShort: {
+    flex: 1,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: Colors.text,
+    fontSize: 14,
+  },
   sectionLabel: { color: Colors.text, fontSize: 16, fontWeight: '700', marginBottom: 6 },
   sectionHint: { color: Colors.textMuted, fontSize: 13, lineHeight: 19, marginBottom: 16 },
   radiusGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

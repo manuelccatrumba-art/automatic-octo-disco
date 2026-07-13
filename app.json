@@ -60,6 +60,14 @@
           "color": "#FF3B6F"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Love Alarm precisa de acesso às tuas fotos para poderes escolher uma foto de perfil.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "expo-font"
     ],
     "extra": {

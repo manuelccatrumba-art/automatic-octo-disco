@@ -7,12 +7,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { useAuth } from '../../contexts/AuthContext';
-import { api, CrushCandidate } from '../../services/api';
+import { api, ApiError, CrushCandidate } from '../../services/api';
 import { UserActionsSheet } from '../../components/UserActionsSheet';
 
 export default function CrushesScreen() {
@@ -58,6 +59,8 @@ export default function CrushesScreen() {
       await api.addCrush(token, targetId);
       setResults((prev) => prev.map((u) => (u.id === targetId ? { ...u, already_crush: true } : u)));
       await loadCrushes();
+    } catch (e) {
+      Alert.alert('Não foi possível adicionar', e instanceof ApiError ? e.message : 'Tenta novamente.');
     } finally {
       setBusyId(null);
     }
@@ -69,6 +72,8 @@ export default function CrushesScreen() {
     try {
       await api.removeCrush(token, targetId);
       await loadCrushes();
+    } catch (e) {
+      Alert.alert('Não foi possível remover', e instanceof ApiError ? e.message : 'Tenta novamente.');
     } finally {
       setBusyId(null);
     }
@@ -170,13 +175,21 @@ export default function CrushesScreen() {
           targetName={selected.display_name}
           onBlock={async () => {
             if (!token) return;
-            await api.blockUser(token, selected.id);
-            setResults((prev) => prev.filter((u) => u.id !== selected.id));
-            await loadCrushes();
+            try {
+              await api.blockUser(token, selected.id);
+              setResults((prev) => prev.filter((u) => u.id !== selected.id));
+              await loadCrushes();
+            } catch (e) {
+              Alert.alert('Não foi possível bloquear', e instanceof ApiError ? e.message : 'Tenta novamente.');
+            }
           }}
           onReport={async (reason) => {
             if (!token) return;
-            await api.reportUser(token, selected.id, reason);
+            try {
+              await api.reportUser(token, selected.id, reason);
+            } catch (e) {
+              Alert.alert('Não foi possível denunciar', e instanceof ApiError ? e.message : 'Tenta novamente.');
+            }
           }}
         />
       )}

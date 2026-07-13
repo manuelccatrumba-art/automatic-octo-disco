@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { useAuth } from '../../contexts/AuthContext';
-import { api, MatchEntry } from '../../services/api';
+import { api, ApiError, MatchEntry } from '../../services/api';
 import { UserActionsSheet } from '../../components/UserActionsSheet';
 
 export default function MatchesScreen() {
@@ -48,11 +48,23 @@ export default function MatchesScreen() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{item.display_name.charAt(0).toUpperCase()}</Text>
+              {item.avatar_base64 ? (
+                <Image source={{ uri: item.avatar_base64 }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarText}>{item.display_name.charAt(0).toUpperCase()}</Text>
+              )}
             </View>
             <View style={styles.rowInfo}>
-              <Text style={styles.rowName}>{item.display_name}</Text>
+              <Text style={styles.rowName}>
+                {item.display_name}
+                {item.pronouns ? <Text style={styles.rowPronouns}>  {item.pronouns}</Text> : null}
+              </Text>
               <Text style={styles.rowUsername}>@{item.username}</Text>
+              {item.bio ? (
+                <Text style={styles.rowBio} numberOfLines={2}>
+                  {item.bio}
+                </Text>
+              ) : null}
             </View>
             <Ionicons name="heart" size={20} color={Colors.heart} style={{ marginRight: 4 }} />
             <TouchableOpacity testID={`match-actions-${item.id}`} onPress={() => setSelected(item)} hitSlop={10}>
@@ -69,17 +81,29 @@ export default function MatchesScreen() {
           targetName={selected.display_name}
           onUnmatch={async () => {
             if (!token) return;
-            await api.unmatch(token, selected.id);
-            await load();
+            try {
+              await api.unmatch(token, selected.id);
+              await load();
+            } catch (e) {
+              Alert.alert('Não foi possível desfazer o match', e instanceof ApiError ? e.message : 'Tenta novamente.');
+            }
           }}
           onBlock={async () => {
             if (!token) return;
-            await api.blockUser(token, selected.id);
-            await load();
+            try {
+              await api.blockUser(token, selected.id);
+              await load();
+            } catch (e) {
+              Alert.alert('Não foi possível bloquear', e instanceof ApiError ? e.message : 'Tenta novamente.');
+            }
           }}
           onReport={async (reason) => {
             if (!token) return;
-            await api.reportUser(token, selected.id, reason);
+            try {
+              await api.reportUser(token, selected.id, reason);
+            } catch (e) {
+              Alert.alert('Não foi possível denunciar', e instanceof ApiError ? e.message : 'Tenta novamente.');
+            }
           }}
         />
       )}
@@ -114,10 +138,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.heart,
   },
+  avatarImage: { width: '100%', height: '100%', borderRadius: 21 },
   avatarText: { color: Colors.heart, fontSize: 18, fontWeight: '800' },
   rowInfo: { flex: 1 },
   rowName: { color: Colors.text, fontSize: 15, fontWeight: '600' },
+  rowPronouns: { color: Colors.textFaint, fontSize: 12, fontWeight: '400' },
   rowUsername: { color: Colors.textFaint, fontSize: 13, marginTop: 2 },
+  rowBio: { color: Colors.textMuted, fontSize: 12, marginTop: 4, lineHeight: 16 },
   emptyWrap: { alignItems: 'center', marginTop: 60, gap: 14, paddingHorizontal: 30 },
   empty: { color: Colors.textFaint, fontSize: 14, textAlign: 'center', lineHeight: 20 },
 });

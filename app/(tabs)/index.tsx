@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { BounceIn, ZoomIn } from 'react-native-reanimated';
 import { HeartAlarm } from '../../components/HeartAlarm';
 import { Colors } from '../../constants/Colors';
 import { useLoveAlarm } from '../../hooks/useLoveAlarm';
@@ -48,8 +49,10 @@ export default function AlarmScreen() {
 
       <Modal visible={!!newMatch} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalEmoji}>🎉</Text>
+          <Animated.View entering={BounceIn.duration(700)} style={styles.modalCard}>
+            <Animated.Text entering={ZoomIn.delay(150).duration(500)} style={styles.modalEmoji}>
+              🎉
+            </Animated.Text>
             <Text style={styles.modalTitle}>É um match!</Text>
             <Text style={styles.modalBody}>
               {newMatch?.display_name} também sente algo por ti — e estava por perto agora mesmo.
@@ -57,7 +60,7 @@ export default function AlarmScreen() {
             <TouchableOpacity style={styles.modalButton} onPress={clearNewMatch} activeOpacity={0.85}>
               <Text style={styles.modalButtonText}>Fixe!</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </SafeAreaView>

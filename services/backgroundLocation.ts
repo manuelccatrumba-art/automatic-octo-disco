@@ -44,7 +44,7 @@ export async function startBackgroundLocation(): Promise<boolean> {
       distanceInterval: 50,
       pausesUpdatesAutomatically: false,
       foregroundService: {
-        notificationTitle: 'Love Alarm activo',
+        notificationTitle: 'Touch Love activo',
         notificationBody: 'A monitorizar se alguém perto de ti sente algo por ti.',
         notificationColor: '#FF3B6F',
       },

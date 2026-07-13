@@ -120,7 +120,7 @@ export default function ProfileScreen() {
     if (!user?.invite_code) return;
     try {
       await Share.share({
-        message: `Vem para o Love Alarm! Usa o meu código de convite ${user.invite_code} quando criares a tua conta.`,
+        message: `Vem para o Touch Love! Usa o meu código de convite ${user.invite_code} quando criares a tua conta.`,
       });
     } catch {}
   };
@@ -316,12 +316,12 @@ export default function ProfileScreen() {
       <View style={styles.legalRow}>
         <Text
           style={styles.legalLink}
-          onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/privacy')}
+          onPress={() => Linking.openURL('https://touch-love-backend.vercel.app/privacy')}
         >
           Política de Privacidade
         </Text>
         <Text style={styles.legalDivider}>·</Text>
-        <Text style={styles.legalLink} onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/terms')}>
+        <Text style={styles.legalLink} onPress={() => Linking.openURL('https://touch-love-backend.vercel.app/terms')}>
           Termos de Serviço
         </Text>
       </View>

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Love Alarm",
-    "slug": "love-alarm",
+    "name": "Touch Love",
+    "slug": "touch-love",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "lovealarm",
+    "scheme": "touchlove",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -13,16 +13,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lovealarm.app",
+      "bundleIdentifier": "com.touchlove.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "O Love Alarm precisa da tua localização para saber quando alguém que gosta de ti está perto.",
+        "NSLocationWhenInUseUsageDescription": "O Touch Love precisa da tua localização para saber quando alguém que gosta de ti está perto.",
         "UIBackgroundModes": [
           "location"
         ]
       }
     },
     "android": {
-      "package": "com.lovealarm.app",
+      "package": "com.touchlove.app",
       "adaptiveIcon": {
         "backgroundColor": "#0A0510",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -48,7 +48,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "O Love Alarm precisa da tua localização para saber quando alguém que gosta de ti está perto.",
+          "locationAlwaysAndWhenInUsePermission": "O Touch Love precisa da tua localização para saber quando alguém que gosta de ti está perto.",
           "isAndroidBackgroundLocationEnabled": true,
           "isAndroidForegroundServiceEnabled": true
         }
@@ -63,12 +63,13 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O Love Alarm precisa de acesso às tuas fotos para poderes escolher uma foto de perfil.",
+          "photosPermission": "O Touch Love precisa de acesso às tuas fotos para poderes escolher uma foto de perfil.",
           "cameraPermission": false,
           "microphonePermission": false
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "extra": {
       "router": {},

@@ -1,4 +1,4 @@
-// Paleta Love Alarm — fundo escuro tipo "app de namoro à noite", coração vivo em vermelho/rosa.
+// Paleta Touch Love — fundo escuro tipo "app de namoro à noite", coração vivo em vermelho/rosa.
 export const Colors = {
   bg: '#0A0510',
   bgElevated: '#150C22',

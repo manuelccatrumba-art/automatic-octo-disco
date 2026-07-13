@@ -47,7 +47,7 @@ export default function LoginScreen() {
         <View style={styles.logoWrap}>
           <HeartAlarm active={false} size={90} />
         </View>
-        <Text style={styles.title}>Love Alarm</Text>
+        <Text style={styles.title}>Touch Love</Text>
         <Text style={styles.subtitle}>O teu coração dispara quando alguém perto gosta de ti.</Text>
 
         <View style={styles.form}>

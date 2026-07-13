@@ -119,13 +119,13 @@ export default function RegisterScreen() {
 
           <Text style={styles.legalText}>
             Ao criar conta, aceitas os{' '}
-            <Text style={styles.legalLink} onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/terms')}>
+            <Text style={styles.legalLink} onPress={() => Linking.openURL('https://touch-love-backend.vercel.app/terms')}>
               Termos de Serviço
             </Text>{' '}
             e a{' '}
             <Text
               style={styles.legalLink}
-              onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/privacy')}
+              onPress={() => Linking.openURL('https://touch-love-backend.vercel.app/privacy')}
             >
               Política de Privacidade
             </Text>

@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
 import { useAuth } from '../../contexts/AuthContext';
 import { api, ApiError, CrushCandidate } from '../../services/api';
 import { UserActionsSheet } from '../../components/UserActionsSheet';
+import { playSound } from '../../services/sounds';
 
 export default function CrushesScreen() {
   const { token } = useAuth();
@@ -57,6 +59,7 @@ export default function CrushesScreen() {
     setBusyId(targetId);
     try {
       await api.addCrush(token, targetId);
+      playSound('crush');
       setResults((prev) => prev.map((u) => (u.id === targetId ? { ...u, already_crush: true } : u)));
       await loadCrushes();
     } catch (e) {
@@ -113,7 +116,9 @@ export default function CrushesScreen() {
               </View>
               <View style={styles.rowActions}>
                 {item.already_crush ? (
-                  <Ionicons name="heart" size={22} color={Colors.heart} />
+                  <Animated.View entering={ZoomIn.springify().damping(9)}>
+                    <Ionicons name="heart" size={22} color={Colors.heart} />
+                  </Animated.View>
                 ) : (
                   <TouchableOpacity
                     style={styles.addButton}

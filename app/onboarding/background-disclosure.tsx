@@ -48,7 +48,7 @@ export default function BackgroundDisclosureScreen() {
       <Text style={styles.disclosure}>
         Esta app recolhe dados de localização para activar o alarme de proximidade mesmo quando a app está
         fechada ou não está a ser utilizada. Isto é o que permite ao teu coração disparar quando alguém que
-        gosta de ti está por perto, sem teres de manter a Love Alarm aberta o tempo todo.
+        gosta de ti está por perto, sem teres de manter a Touch Love aberta o tempo todo.
       </Text>
 
       <Text style={styles.note}>

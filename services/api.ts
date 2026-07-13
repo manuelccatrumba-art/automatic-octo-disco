@@ -1,4 +1,4 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://love-alarm-backend.vercel.app/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://touch-love-backend.vercel.app/api';
 
 export class ApiError extends Error {
   status: number;

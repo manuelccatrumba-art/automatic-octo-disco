@@ -15,8 +15,8 @@ export async function registerForPushNotifications(): Promise<string | null> {
   if (!Device.isDevice) return null;
 
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('love-alarm', {
-      name: 'Love Alarm',
+    await Notifications.setNotificationChannelAsync('touch-love', {
+      name: 'Touch Love',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF3B6F',

@@ -3,6 +3,7 @@ import * as Location from 'expo-location';
 import { useAuth } from '../contexts/AuthContext';
 import { api, LocationUpdateResult } from '../services/api';
 import { registerForPushNotifications } from '../services/notifications';
+import { playSound } from '../services/sounds';
 
 const PING_INTERVAL_MS = 20000;
 
@@ -16,6 +17,7 @@ export function useLoveAlarm() {
   const [lastPingAt, setLastPingAt] = useState<Date | null>(null);
   const pushTokenRef = useRef<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const wasActiveRef = useRef(false);
 
   const ping = useCallback(async () => {
     if (!token) return;
@@ -27,9 +29,14 @@ export function useLoveAlarm() {
         pos.coords.longitude,
         pushTokenRef.current
       );
+      if (result.alarmActive && !wasActiveRef.current) playSound('alarm');
+      wasActiveRef.current = result.alarmActive;
       setAlarmActive(result.alarmActive);
       setNearbyAdmirersCount(result.nearbyAdmirersCount);
-      if (result.newMatches.length > 0) setNewMatch(result.newMatches[0]);
+      if (result.newMatches.length > 0) {
+        playSound('match');
+        setNewMatch(result.newMatches[0]);
+      }
       setLastPingAt(new Date());
       setError(null);
     } catch (e) {

@@ -1,4 +1,4 @@
-// Script de geração dos ícones da marca Love Alarm — usa 'sharp' para rasterizar SVG.
+// Script de geração dos ícones da marca Touch Love — usa 'sharp' para rasterizar SVG.
 // Não faz parte do build da app; corre-se manualmente sempre que a marca mudar.
 const path = require('path');
 const sharp = require('sharp');

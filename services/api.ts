@@ -95,12 +95,12 @@ export const api = {
     request<{ users: CrushCandidate[] }>(`/users/search?q=${encodeURIComponent(q)}`, { token }),
 
   addCrush: (token: string, target_id: number) =>
-    request<{ ok: true }>('/crush/add', { method: 'POST', token, body: { target_id } }),
+    request<{ ok: true }>('/crush', { method: 'POST', token, body: { target_id } }),
 
   removeCrush: (token: string, target_id: number) =>
-    request<{ ok: true }>('/crush/list', { method: 'DELETE', token, body: { target_id } }),
+    request<{ ok: true }>('/crush', { method: 'DELETE', token, body: { target_id } }),
 
-  listCrushes: (token: string) => request<{ crushes: CrushCandidate[] }>('/crush/list', { token }),
+  listCrushes: (token: string) => request<{ crushes: CrushCandidate[] }>('/crush', { token }),
 
   updateLocation: (token: string, lat: number, lng: number, push_token?: string | null) =>
     request<LocationUpdateResult>('/location/update', {
@@ -109,22 +109,24 @@ export const api = {
       body: { lat, lng, push_token },
     }),
 
-  listMatches: (token: string) => request<{ matches: MatchEntry[] }>('/matches/list', { token }),
+  listMatches: (token: string) => request<{ matches: MatchEntry[] }>('/matches', { token }),
 
   unmatch: (token: string, target_id: number) =>
-    request<{ ok: true }>('/matches/remove', { method: 'DELETE', token, body: { target_id } }),
+    request<{ ok: true }>('/matches', { method: 'DELETE', token, body: { target_id } }),
 
   blockUser: (token: string, target_id: number) =>
-    request<{ ok: true }>('/block/add', { method: 'POST', token, body: { target_id } }),
+    request<{ ok: true }>('/block', { method: 'POST', token, body: { target_id } }),
 
   unblockUser: (token: string, target_id: number) =>
-    request<{ ok: true }>('/block/list', { method: 'DELETE', token, body: { target_id } }),
+    request<{ ok: true }>('/block', { method: 'DELETE', token, body: { target_id } }),
 
-  listBlocks: (token: string) => request<{ blocks: CrushCandidate[] }>('/block/list', { token }),
+  listBlocks: (token: string) => request<{ blocks: CrushCandidate[] }>('/block', { token }),
 
   reportUser: (token: string, target_id: number, reason: ReportReason) =>
     request<{ ok: true }>('/report', { method: 'POST', token, body: { target_id, reason } }),
 
   deleteAccount: (token: string, password: string) =>
     request<{ ok: true }>('/me', { method: 'DELETE', token, body: { password } }),
+
+  logoutAllSessions: (token: string) => request<{ ok: true }>('/auth/logout-all', { method: 'POST', token }),
 };

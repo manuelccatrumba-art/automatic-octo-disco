@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -115,6 +116,21 @@ export default function RegisterScreen() {
           >
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Criar conta</Text>}
           </TouchableOpacity>
+
+          <Text style={styles.legalText}>
+            Ao criar conta, aceitas os{' '}
+            <Text style={styles.legalLink} onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/terms')}>
+              Termos de Serviço
+            </Text>{' '}
+            e a{' '}
+            <Text
+              style={styles.legalLink}
+              onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/privacy')}
+            >
+              Política de Privacidade
+            </Text>
+            .
+          </Text>
         </View>
 
         <Link href="/(auth)/login" asChild>
@@ -181,6 +197,8 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   buttonText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  legalText: { color: Colors.textFaint, fontSize: 12, textAlign: 'center', marginTop: 14, lineHeight: 17 },
+  legalLink: { color: Colors.heart, fontWeight: '600' },
   link: { color: Colors.textMuted, textAlign: 'center', marginTop: 24, fontSize: 15 },
   linkAccent: { color: Colors.heart, fontWeight: '700' },
 });

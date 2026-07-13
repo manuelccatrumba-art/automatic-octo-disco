@@ -11,6 +11,7 @@ import {
   Switch,
   Share,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +29,7 @@ export default function ProfileScreen() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [togglingPause, setTogglingPause] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   const onTogglePause = async (value: boolean) => {
     if (!token) return;
@@ -58,6 +60,30 @@ export default function ProfileScreen() {
         message: `Vem para o Love Alarm! Usa o meu código de convite ${user.invite_code} quando criares a tua conta.`,
       });
     } catch {}
+  };
+
+  const onLogoutAllSessions = () => {
+    Alert.alert(
+      'Terminar sessão em todos os dispositivos',
+      'Isto obriga a voltar a entrar em qualquer telemóvel onde a tua conta esteja aberta, incluindo este.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Terminar todas',
+          style: 'destructive',
+          onPress: async () => {
+            if (!token) return;
+            setLoggingOutAll(true);
+            try {
+              await api.logoutAllSessions(token);
+            } finally {
+              setLoggingOutAll(false);
+              await logout();
+            }
+          },
+        },
+      ]
+    );
   };
 
   const onLogout = () => {
@@ -160,12 +186,38 @@ export default function ProfileScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={styles.logoutAllLink}
+        onPress={onLogoutAllSessions}
+        activeOpacity={0.7}
+        disabled={loggingOutAll}
+      >
+        {loggingOutAll ? (
+          <ActivityIndicator size="small" color={Colors.textFaint} />
+        ) : (
+          <Text style={styles.deleteAccountText}>Terminar sessão em todos os dispositivos</Text>
+        )}
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.deleteAccountLink}
         onPress={() => setDeleteModalOpen(true)}
         activeOpacity={0.7}
       >
         <Text style={styles.deleteAccountText}>Apagar conta</Text>
       </TouchableOpacity>
+
+      <View style={styles.legalRow}>
+        <Text
+          style={styles.legalLink}
+          onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/privacy')}
+        >
+          Política de Privacidade
+        </Text>
+        <Text style={styles.legalDivider}>·</Text>
+        <Text style={styles.legalLink} onPress={() => Linking.openURL('https://love-alarm-backend.vercel.app/terms')}>
+          Termos de Serviço
+        </Text>
+      </View>
       </ScrollView>
 
       <Modal visible={deleteModalOpen} transparent animationType="fade" onRequestClose={closeDeleteModal}>
@@ -295,8 +347,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logoutText: { color: Colors.danger, fontSize: 16, fontWeight: '700' },
+  logoutAllLink: { alignItems: 'center', paddingVertical: 8 },
   deleteAccountLink: { alignItems: 'center', paddingVertical: 8, marginBottom: 24 },
   deleteAccountText: { color: Colors.textFaint, fontSize: 13, textDecorationLine: 'underline' },
+  legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 8 },
+  legalLink: { color: Colors.textFaint, fontSize: 12 },
+  legalDivider: { color: Colors.textFaint, fontSize: 12 },
   modalOverlay: { flex: 1, backgroundColor: '#000000CC', alignItems: 'center', justifyContent: 'center', padding: 32 },
   modalCard: {
     backgroundColor: Colors.card,
